@@ -205,7 +205,7 @@ library D4AReward{
     }
     return project_amount;
   }
-  event D4AExchangeERC20ToETH(address owner, address to, uint256 erc20_amount, uint256 eth_amount);
+  event D4AExchangeERC20ToETH(bytes32 project_id, address owner, address to, uint256 erc20_amount, uint256 eth_amount);
 
   function claimProjectERC20RewardWithETH(
                              ID4ASetting _settings,
@@ -232,12 +232,13 @@ library D4AReward{
       uint256 cur_round = prb.currentRound();
 
       uint256 circulate_erc20 = IERC20Upgradeable(erc20_token).totalSupply() + erc20_amount - IERC20Upgradeable(erc20_token).balanceOf(fee_pool);
+      if (circulate_erc20 == 0) return 0;
       uint256 avaliable_eth = fee_pool.balance - round_2_total_eth[project_id][cur_round];
       uint256 to_send = erc20_amount * avaliable_eth / circulate_erc20;
       if(to_send != 0){
         D4AFeePool(payable(fee_pool)).transfer(address(0x0), payable(_to), to_send);
       }
-      emit D4AExchangeERC20ToETH(_owner, _to, erc20_amount, to_send);
+      emit D4AExchangeERC20ToETH(project_id, _owner, _to, erc20_amount, to_send);
       return to_send;
   }
 

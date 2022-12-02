@@ -147,7 +147,7 @@ contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
   }
 
   event D4AClaimProjectERC20Reward(bytes32 project_id, address erc20_token, uint256 amount);
-  event D4AExchangeERC20ToETH(address owner, uint256 erc20_amount, uint256 eth_amount);
+  event D4AExchangeERC20ToETH(bytes32 project_id, address owner, address to, uint256 erc20_amount, uint256 eth_amount);
 
   function claimProjectERC20Reward(bytes32 _project_id) public nonReentrant returns(uint256){
     require(!settings.d4a_pause(), "D4A Paused");
