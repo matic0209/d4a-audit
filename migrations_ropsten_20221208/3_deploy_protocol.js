@@ -35,8 +35,6 @@ async function performMigration(deployer, network, accounts, dhelper) {
 
   const instance = await upgradeProxy(old_address, D4AProtocol, { deployer, unsafeAllowLinkedLibraries:true });
 
-  await instance.changeSetting(sr.read("setting"))
-
   sr.write("protocol", instance.address)
 
   console.log("procotol: ", instance.address);

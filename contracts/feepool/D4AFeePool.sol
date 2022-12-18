@@ -43,6 +43,7 @@ contract D4AFeePool is AccessControlUpgradeable, ReentrancyGuardUpgradeable{
   receive() external payable{ }
 
   function changeAdmin(address new_admin) public onlyRole(DEFAULT_ADMIN_ROLE){
+    require(msg.sender != new_admin, "new admin cannot be same as old one");
     _grantRole(DEFAULT_ADMIN_ROLE, new_admin);
     _revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
   }

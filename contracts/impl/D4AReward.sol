@@ -30,7 +30,8 @@ library D4AReward{
                                    bytes32 _project_id,
                                    address erc20_token,
                                    uint256 _start_round,
-                                   uint256 total_rounds) internal returns(uint256){
+                                   uint256 total_rounds,
+                                   uint256 erc20_total_supply) internal returns(uint256){
     ID4APRB prb = _settings.PRB();
     uint256 cur_round = prb.currentRound();
     if(cur_round <= _start_round){
@@ -60,7 +61,7 @@ library D4AReward{
     }
 
 
-    uint256 amount = (n - all_rewards[_project_id].issued_rounds)*_settings.erc20_total_supply()/total_rounds;
+    uint256 amount = (n - all_rewards[_project_id].issued_rounds) * erc20_total_supply / total_rounds;
 
     ID4AMintableERC20(erc20_token).mint(address(this),  amount);
     all_rewards[_project_id].issued_rounds = n;
@@ -97,8 +98,9 @@ library D4AReward{
                              bytes32 _canvas_id,
                              address _erc20_token,
                              uint256 _start_round,
-                             uint256 _total_rounds) internal returns(uint256){
-      updateRewardForCanvas(all_rewards, _settings, _project_id, _canvas_id, _start_round, _total_rounds);
+                             uint256 _total_rounds,
+                             uint256 erc20_total_supply) internal returns(uint256){
+      updateRewardForCanvas(all_rewards, _settings, _project_id, _canvas_id, _start_round, _total_rounds, erc20_total_supply);
       reward_info storage ri = all_rewards[_project_id];
       uint256 total_amount = ri.canvas_2_unclaimed_amount[_canvas_id];
       ri.canvas_2_unclaimed_amount[_canvas_id] = 0;
@@ -113,7 +115,7 @@ library D4AReward{
   function updateRewardForCanvas(mapping(bytes32=>reward_info) storage all_rewards,
                                  ID4ASetting _settings,
                                  bytes32 _project_id,
-                                 bytes32 _canvas_id, uint256 _start_round, uint256 _total_rounds) internal{
+                                 bytes32 _canvas_id, uint256 _start_round, uint256 _total_rounds, uint256 erc20_total_supply) internal{
     uint256 cur_round;
     {
       ID4APRB prb = _settings.PRB();
@@ -135,7 +137,7 @@ library D4AReward{
       }
 
       uint256 tk =
-        _settings.erc20_total_supply() * _settings.canvas_erc20_ratio() /(_settings.ratio_base() *_total_rounds);
+        erc20_total_supply * _settings.canvas_erc20_ratio() /(_settings.ratio_base() *_total_rounds);
 
       for(uint256 i = ri.canvas_2_to_claim_round_index[_canvas_id]; i <= ri.final_issued_round_index; i++){
         if(ri.active_rounds[i] == cur_round){
@@ -168,7 +170,8 @@ library D4AReward{
                              bytes32 _project_id,
                              address erc20_token,
                              uint256 _start_round,
-                             uint256 _total_rounds) internal
+                             uint256 _total_rounds,
+                             uint256 erc20_total_supply) internal
     returns(uint256){
     reward_info storage ri = all_rewards[_project_id];
     if(ri.active_rounds.length == 0){
@@ -192,9 +195,9 @@ library D4AReward{
     ri.project_owner_to_claim_round_index = ri.final_issued_round_index + 1;
 
     uint256 d4a_amount =
-      _settings.erc20_total_supply() * _settings.d4a_erc20_ratio() * n /(_settings.ratio_base() *_total_rounds);
+      erc20_total_supply * _settings.d4a_erc20_ratio() * n /(_settings.ratio_base() *_total_rounds);
     uint256 project_amount =
-      _settings.erc20_total_supply() * _settings.project_erc20_ratio() * n /(_settings.ratio_base() *_total_rounds);
+      erc20_total_supply * _settings.project_erc20_ratio() * n /(_settings.ratio_base() *_total_rounds);
 
     if(project_amount != 0){
       address project_owner = _settings.owner_proxy().ownerOf(_project_id);

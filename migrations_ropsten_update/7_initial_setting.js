@@ -4,7 +4,7 @@ const D4ASetting = artifacts.require("D4ASetting");
 const DummyPRB = artifacts.require("DummyPRB");
 const D4APRB = artifacts.require("D4APRB")
 const D4AERC20Factory = artifacts.require("D4AERC20Factory");
-const D4AERC721Factory = artifacts.require("D4AERC721WithFilterFactory")
+const D4AERC721WithFilterFactory = artifacts.require("D4AERC721WithFilterFactory")
 const D4AProtocol = artifacts.require("D4AProtocol")
 const { deployProxy  } = require('@openzeppelin/truffle-upgrades');
 const D4APrice = artifacts.require("D4APrice")
@@ -14,8 +14,7 @@ const D4AReward = artifacts.require("D4AReward")
 const NaiveOwner = artifacts.require("NaiveOwner")
 const D4ACreateProjectProxy = artifacts.require("D4ACreateProjectProxy")
 const D4ARoyaltySplitterFactory = artifacts.require("D4ARoyaltySplitterFactory")
-
-//const D4AClaimer = artifacts.require("D4AClaimer")
+const D4AClaimer = artifacts.require("D4AClaimer")
 
 async function performMigration(deployer, network, accounts, dhelper) {
   console.log("dhelper", dhelper)

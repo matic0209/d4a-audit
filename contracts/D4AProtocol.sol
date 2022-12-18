@@ -131,7 +131,8 @@ contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
                                         proj_id,
                                         _canvas_id,
                                         all_projects[proj_id].start_prb,
-                                        all_projects[proj_id].mintable_rounds);
+                                        all_projects[proj_id].mintable_rounds, 
+                                        all_projects[proj_id].erc20_total_supply);
     }
 
     token_id = ID4AERC721(all_projects[proj_id].erc721_token).mintItem(msg.sender, _token_uri);
@@ -155,8 +156,8 @@ contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
     if(!all_projects[_project_id].exist) revert D4AProjectNotExist(_project_id);
 
     D4AProject.project_info storage pi = all_projects[_project_id];
-    all_rewards.issueTokenToCurrentRound(settings, _project_id, pi.erc20_token, pi.start_prb, pi.mintable_rounds);
-    uint256 amount = all_rewards.claimProjectReward(settings, _project_id, pi.erc20_token, pi.start_prb, pi.mintable_rounds);
+    all_rewards.issueTokenToCurrentRound(settings, _project_id, pi.erc20_token, pi.start_prb, pi.mintable_rounds, pi.erc20_total_supply);
+    uint256 amount = all_rewards.claimProjectReward(settings, _project_id, pi.erc20_token, pi.start_prb, pi.mintable_rounds, pi.erc20_total_supply);
     emit D4AClaimProjectERC20Reward(_project_id, pi.erc20_token, amount);
     return amount;
   }
@@ -179,10 +180,10 @@ contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
 
     D4AProject.project_info storage pi = all_projects[project_id];
 
-    all_rewards.issueTokenToCurrentRound(settings, project_id, pi.erc20_token, pi.start_prb, pi.mintable_rounds);
+    all_rewards.issueTokenToCurrentRound(settings, project_id, pi.erc20_token, pi.start_prb, pi.mintable_rounds, pi.erc20_total_supply);
     uint256 amount =  all_rewards.claimCanvasReward(settings, project_id,
                                          _canvas_id, pi.erc20_token,
-                                         pi.start_prb, pi.mintable_rounds);
+                                         pi.start_prb, pi.mintable_rounds, pi.erc20_total_supply);
     emit D4AClaimCanvasReward(project_id, _canvas_id, pi.erc20_token, amount);
     return amount;
   }
@@ -199,7 +200,8 @@ contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
     require(!settings.d4a_pause(), "D4A Paused");
     require(!settings.pause_status(_project_id), "Project Paused");
 
-    D4AProject.project_info storage pi = all_projects[_project_id];
+    D4AProject.project_info storage pi = all_projects[_project_id]; 
+    all_rewards.issueTokenToCurrentRound(settings, _project_id, pi.erc20_token, pi.start_prb, pi.mintable_rounds, pi.erc20_total_supply);
     return D4AReward.ToETH(settings, pi.erc20_token, pi.fee_pool, _project_id, msg.sender, _to, amount, round_2_total_eth);
   }
 }
