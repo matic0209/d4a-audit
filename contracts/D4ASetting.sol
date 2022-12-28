@@ -113,5 +113,9 @@ contract D4ASetting is Ownable, ID4ASetting{
     emit D4ASetCanvasPaused(obj_id, is_paused);
   }
 
-
+  event ChangeWETHAddress(address indexed WETH);
+  function changeWETHAddress(address _WETH) public onlyOwner {
+    WETH = _WETH;
+    emit ChangeWETHAddress(WETH);
+  }
 }

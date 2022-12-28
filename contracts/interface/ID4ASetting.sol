@@ -48,6 +48,8 @@ contract ID4ASetting{
 
   mapping(bytes32 => bool) public pause_status;
 
+  address public WETH;
+
   constructor(){
     //some default value here
     ratio_base = 10000;
@@ -63,6 +65,7 @@ contract ID4ASetting{
     d4a_erc20_ratio = 200;
     canvas_erc20_ratio = 9500;
     project_max_rounds = 366;
+
   }
 
   function floor_prices_length() public view returns(uint256){

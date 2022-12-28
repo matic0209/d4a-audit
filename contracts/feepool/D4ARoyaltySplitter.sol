@@ -3,10 +3,13 @@ pragma solidity >=0.8.10;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../interface/ID4ASetting.sol";
 import "../interface/ID4AProtocol.sol";
 import "../interface/ID4ARoyaltySplitterFactory.sol";
 import "../utils/TokenClaimer.sol";
+import "../interface/IWETH.sol";
 
 contract D4ARoyaltySplitter is Initializable, OwnableUpgradeable, TokenClaimer{
   ID4ASetting public setting;
@@ -15,6 +18,8 @@ contract D4ARoyaltySplitter is Initializable, OwnableUpgradeable, TokenClaimer{
   bytes32 public proj_id;
   uint256 public w1;
   uint256 public w2;
+
+  using SafeERC20 for IERC20;
 
   function initialize(ID4ASetting _setting, address _addr1, uint256 _w1, address _addr2, uint256 _w2) public initializer{
     __Ownable_init();
@@ -32,6 +37,25 @@ contract D4ARoyaltySplitter is Initializable, OwnableUpgradeable, TokenClaimer{
 
   function claimStdTokens(address _token, address payable to) public onlyOwner{
     _claimStdTokens(_token, to);
+  }
+
+  function claimERC20(address token) external {
+    uint256 balance = IERC20(token).balanceOf(address(this));
+    uint256 v1 = balance * w1/(w1 + w2);
+    uint256 v2 = balance - v1;
+
+    if(v1 != 0){
+      IERC20(token).safeTransfer(addr1, v1);
+    }
+    if(v2 != 0){
+      IERC20(token).safeTransfer(addr2, v2);
+      //(succ, ) = setting.owner_proxy().ownerOf(proj_id).call{value:v2}("");
+    }
+  }
+
+  function claimWETH() external {
+    IWETH token = IWETH(setting.WETH());
+    token.withdraw(token.balanceOf(address(this)));
   }
 
   fallback() external payable{

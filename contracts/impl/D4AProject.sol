@@ -70,7 +70,7 @@ library D4AProject{
       {
         ID4APRB prb = _settings.PRB();
         uint256 cur_round = prb.currentRound();
-        require(_start_prb >  cur_round, "start round already passed");
+        require(_start_prb >= cur_round, "start round already passed");
       }
       pi.mintable_rounds = _mintable_rounds;
       pi.floor_price_rank = _floor_price_rank;

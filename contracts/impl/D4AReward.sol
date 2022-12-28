@@ -63,7 +63,7 @@ library D4AReward{
 
     uint256 amount = (n - all_rewards[_project_id].issued_rounds) * erc20_total_supply / total_rounds;
 
-    ID4AMintableERC20(erc20_token).mint(address(this),  amount);
+    if (amount > 0) ID4AMintableERC20(erc20_token).mint(address(this),  amount);
     all_rewards[_project_id].issued_rounds = n;
     return amount;
   }
