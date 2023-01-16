@@ -26,6 +26,14 @@ abstract contract ID4AProtocol{
                          uint96 _royalty_fee,
                          string memory _project_uri) virtual external payable returns(bytes32 project_id);
 
+  function createOwnerProject(uint256 _start_prb,
+                         uint256 _mintable_rounds,
+                         uint256 _floor_price_rank,
+                         uint256 _max_nft_rank,
+                         uint96 _royalty_fee,
+                         string memory _project_uri,
+                         uint256 _project_index) virtual external payable returns(bytes32 project_id);
+
   function getProjectCanvasAt(bytes32 _project_id, uint256 _index) public view returns(bytes32){
     return all_projects.getProjectCanvasAt(_project_id, _index);
   }

@@ -11,7 +11,6 @@ import "./interface/ID4ASetting.sol";
 import "./interface/ID4AProtocol.sol";
 import "./interface/IOwnable.sol";
 
-
 contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
   using D4AProject for mapping(bytes32=>D4AProject.project_info);
   using D4ACanvas for mapping(bytes32=>D4ACanvas.canvas_info);
@@ -27,6 +26,8 @@ contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
 
   uint256 public canvas_num;
 
+  uint256 public project_bitmap;
+
   //event from library
   event NewProject(bytes32 project_id, string uri, address fee_pool, address erc20_token, address erc721_token, uint256 royalty_fee);
   event NewCanvas(bytes32 project_id, bytes32 canvas_id, string uri);
@@ -34,6 +35,7 @@ contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
   function initialize(address _settings) public initializer{
     __ReentrancyGuard_init();
     settings = ID4ASetting(_settings);
+    project_num = 109;
   }
 
   function changeSetting(address _settings) public{
@@ -42,17 +44,38 @@ contract D4AProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtocol{
     settings = ID4ASetting(_settings);
   }
 
+  modifier onlyProjectProxy() {
+    require(msg.sender == settings.project_proxy(), "only project proxy can call protocol");
+    _;
+  }
+
   function createProject(uint256 _start_prb,
                          uint256 _mintable_rounds,
                          uint256 _floor_price_rank,
                          uint256 _max_nft_rank,
                          uint96 _royalty_fee,
-                         string memory _project_uri) public override payable nonReentrant returns(bytes32 project_id){
+                         string memory _project_uri) public override payable nonReentrant onlyProjectProxy returns(bytes32 project_id){
     require(!settings.d4a_pause(), "D4A Paused");
     require(!uri_exists[keccak256(abi.encodePacked(_project_uri))], "project_uri already exist");
     uri_exists[keccak256(abi.encodePacked(_project_uri))] = true;
     project_num ++;
     return all_projects.createProject(settings, _start_prb, _mintable_rounds, _floor_price_rank, _max_nft_rank, _royalty_fee, project_num, _project_uri);
+  }
+
+  function createOwnerProject(uint256 _start_prb,
+                         uint256 _mintable_rounds,
+                         uint256 _floor_price_rank,
+                         uint256 _max_nft_rank,
+                         uint96 _royalty_fee,
+                         string memory _project_uri,
+                         uint256 _project_index) public override payable nonReentrant onlyProjectProxy returns(bytes32 project_id){
+    require(!settings.d4a_pause(), "D4A Paused");
+    require(_project_index < 110, "INDEX_ERROR: project index too large");
+    require(((project_bitmap >> _project_index) & 1) == 0, "INDEX_ERROR: project index already exist");
+    project_bitmap |= (1 << _project_index);
+    require(!uri_exists[keccak256(abi.encodePacked(_project_uri))], "project_uri already exist");
+    uri_exists[keccak256(abi.encodePacked(_project_uri))] = true;
+    return all_projects.createProject(settings, _start_prb, _mintable_rounds, _floor_price_rank, _max_nft_rank, _royalty_fee, _project_index, _project_uri);
   }
 
   function getProjectCanvasCount(bytes32 _project_id) public view returns(uint256){

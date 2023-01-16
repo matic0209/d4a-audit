@@ -7,6 +7,10 @@ import "./ID4AOwnerProxy.sol";
 import "./ID4AERC721.sol";
 import "./ID4AERC721Factory.sol";
 
+interface ID4AProtocolForSetting {
+  function getCanvasProject(bytes32 _canvas_id) external view returns(bytes32);
+}
+
 contract ID4ASetting{
   uint256 public ratio_base;
   uint256 public min_stamp_duty; //TODO
@@ -42,6 +46,7 @@ contract ID4ASetting{
   ID4AERC20Factory public erc20_factory;
   ID4AFeePoolFactory public feepool_factory;
   ID4AOwnerProxy public owner_proxy;
+  ID4AProtocolForSetting public protocol;
   address public asset_pool_owner;
 
   bool public d4a_pause;
@@ -49,6 +54,8 @@ contract ID4ASetting{
   mapping(bytes32 => bool) public pause_status;
 
   address public WETH;
+
+  address public project_proxy;
 
   constructor(){
     //some default value here

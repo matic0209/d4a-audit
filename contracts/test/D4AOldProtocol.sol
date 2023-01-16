@@ -46,6 +46,20 @@ contract D4AOldProtocol is Initializable, ReentrancyGuardUpgradeable, ID4AProtoc
     return all_projects.createProject(settings, _start_prb, _mintable_rounds, _floor_price_rank, _max_nft_rank, _royalty_fee, project_num, _project_uri);
   }
 
+  function createOwnerProject(uint256 _start_prb,
+                         uint256 _mintable_rounds,
+                         uint256 _floor_price_rank,
+                         uint256 _max_nft_rank,
+                         uint96 _royalty_fee,
+                         string memory _project_uri,
+                         uint256 _project_id) public override payable nonReentrant returns(bytes32 project_id){
+    require(!settings.d4a_pause(), "D4A Paused");
+    require(!uri_exists[keccak256(abi.encodePacked(_project_uri))], "project_uri already exist");
+    uri_exists[keccak256(abi.encodePacked(_project_uri))] = true;
+    project_num ++;
+    return all_projects.createProject(settings, _start_prb, _mintable_rounds, _floor_price_rank, _max_nft_rank, _royalty_fee, project_num, _project_uri);
+  }
+
   function getProjectCanvasCount(bytes32 _project_id) public view returns(uint256){
     return all_projects.getProjectCanvasCount(_project_id);
   }
