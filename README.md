@@ -4,6 +4,7 @@ This repo contains all smart contracts code for project DAO for Art(D4A in
 brief), which runs
 on Ethereum.
 
+
 ## Basic for Dev
 
 In D4A, a user may create a `project`, thus we call the user `project owner`.
